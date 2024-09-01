@@ -35,6 +35,7 @@ func main() {
 	router.HandleFunc("GET /books/{id}", boooHandlers.GetBookByID)
 	router.HandleFunc("PUT /books/{id}", boooHandlers.UpdateBook)
 	router.HandleFunc("DELETE /books/{id}", boooHandlers.DeleteBook)
+	router.HandleFunc("POST /books/simulate", boooHandlers.ReadBooks)
 
 	http.ListenAndServe(":8080", router)
 

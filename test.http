@@ -3,6 +3,10 @@
 GET http://localhost:8080/books
 Accept: application/json
 
+### Get books by name
+GET http://localhost:8080/books?name=full
+Accept: application/json
+
 ### Add a new book
 POST http://localhost:8080/books
 Content-Type: application/json
@@ -11,6 +15,15 @@ Content-Type: application/json
     "title":"Livro Full Cycle",
     "author": "Wesley willians",
     "genre": "Software Engineering" 
+}
+### Add a new book
+POST http://localhost:8080/books/simulate
+Content-Type: application/json
+
+{
+ "IDs":[
+    1,2,3
+ ]
 }
 
 ### Get Book by ID

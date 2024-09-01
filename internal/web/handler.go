@@ -3,8 +3,10 @@ package web
 import (
 	"encoding/json"
 	"gobooks/internal/service"
+	"log"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type BookHandlers struct {
@@ -16,6 +18,20 @@ func NewBookhandlers(service *service.BookService) *BookHandlers {
 }
 
 func (h *BookHandlers) GetBooks(w http.ResponseWriter, r *http.Request) {
+	bookName := r.URL.Query().Get("name")
+
+	if len(bookName) != 0 {
+		books, err := h.service.SearchBooksByName(bookName)
+
+		if err != nil {
+			http.Error(w, "Falied to get Books", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(books)
+		return
+	}
 
 	books, err := h.service.GetBooks()
 
@@ -118,4 +134,27 @@ func (h *BookHandlers) DeleteBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
+}
+
+type BookIDs struct {
+	IDs []int `json:"ids"`
+}
+
+func (h *BookHandlers) ReadBooks(w http.ResponseWriter, r *http.Request) {
+
+	var bookIDs BookIDs
+
+	err := json.NewDecoder(r.Body).Decode(&bookIDs)
+
+	if err != nil {
+		log.Println("Falied to receive Books:", err)
+		http.Error(w, "Falied to receive Books", http.StatusInternalServerError)
+		return
+	}
+
+	responses := h.service.SimulateMultipleReading(bookIDs.IDs, 2*time.Second)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(responses)
+
 }
