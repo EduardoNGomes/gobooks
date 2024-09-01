@@ -1,0 +1,28 @@
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func worker(workerID int, data chan int) {
+	for x := range data {
+		fmt.Printf("worker %d got %d\n", workerID, x)
+		time.Sleep(time.Second)
+	}
+}
+
+// GO Routines
+func main() {
+	ch := make(chan int)
+	qtdWorkers := 3
+
+	for i := range qtdWorkers {
+		go worker(i, ch)
+
+	}
+
+	for i := range 10 {
+		ch <- i
+	}
+}
