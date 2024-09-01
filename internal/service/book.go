@@ -1,6 +1,10 @@
 package service
 
-import "database/sql"
+import (
+	"database/sql"
+	"fmt"
+	"time"
+)
 
 type Book struct {
 	ID     int
@@ -95,4 +99,64 @@ func (s *BookService) DeleteBook(id int) error {
 
 	return err
 
+}
+
+func (s *BookService) SearchBooksByName(name string) ([]Book, error) {
+	query := "SELECT * FROM books WHERE books.title LIKE %?%;"
+
+	rows, err := s.db.Query(query, name)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var books []Book
+
+	for rows.Next() {
+		var book Book
+
+		err := rows.Scan(&book.ID, &book.Author, &book.Genre, &book.Title)
+
+		if err != nil {
+			return nil, err
+		}
+		books = append(books, book)
+	}
+
+	return books, nil
+}
+
+func (s *BookService) SimulateReading(bookID int, duration time.Duration, results chan<- string) {
+	book, err := s.GetBookByID(bookID)
+
+	if err != nil || book != nil {
+		results <- fmt.Sprintf("Book %d not fount", bookID)
+	}
+
+	time.Sleep(duration)
+
+	results <- fmt.Sprintf("Book %s read", book.Title)
+}
+
+func (s *BookService) SimulateMultipleReading(bookIDs []int, duration time.Duration) []string {
+
+	results := make(chan string, len(bookIDs))
+
+	for _, id := range bookIDs {
+		go func(bookID int) {
+			s.SimulateReading(bookID, duration, results)
+		}(id)
+	}
+
+	var responses []string
+
+	for range bookIDs {
+		responses = append(responses, <-results)
+	}
+
+	close(results)
+
+	return responses
 }
