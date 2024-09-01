@@ -55,7 +55,7 @@ func (s *BookService) GetBooks() ([]Book, error) {
 	for rows.Next() {
 		var book Book
 
-		err := rows.Scan(&book.ID, &book.Author, &book.Genre, &book.Title)
+		err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.Genre)
 
 		if err != nil {
 			return nil, err
@@ -117,7 +117,7 @@ func (s *BookService) SearchBooksByName(name string) ([]Book, error) {
 	for rows.Next() {
 		var book Book
 
-		err := rows.Scan(&book.ID, &book.Author, &book.Genre, &book.Title)
+		err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.Genre)
 
 		if err != nil {
 			return nil, err
