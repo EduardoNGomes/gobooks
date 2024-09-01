@@ -102,9 +102,9 @@ func (s *BookService) DeleteBook(id int) error {
 }
 
 func (s *BookService) SearchBooksByName(name string) ([]Book, error) {
-	query := "SELECT * FROM books WHERE books.title LIKE %?%;"
+	query := "SELECT * FROM books WHERE books.title LIKE ?;"
 
-	rows, err := s.db.Query(query, name)
+	rows, err := s.db.Query(query, "%"+name+"%")
 
 	if err != nil {
 		return nil, err
@@ -131,13 +131,14 @@ func (s *BookService) SearchBooksByName(name string) ([]Book, error) {
 func (s *BookService) SimulateReading(bookID int, duration time.Duration, results chan<- string) {
 	book, err := s.GetBookByID(bookID)
 
-	if err != nil || book != nil {
+	if err != nil || book == nil {
 		results <- fmt.Sprintf("Book %d not fount", bookID)
+		return
 	}
 
 	time.Sleep(duration)
 
-	results <- fmt.Sprintf("Book %s read", book.Title)
+	results <- fmt.Sprintf("Book: %s has been read", book.Title)
 }
 
 func (s *BookService) SimulateMultipleReading(bookIDs []int, duration time.Duration) []string {
