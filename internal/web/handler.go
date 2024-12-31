@@ -62,7 +62,11 @@ func (h *BookHandlers) CreateBook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(book)
+	err = json.NewEncoder(w).Encode(book)
+	if err != nil {
+		http.Error(w, "Failed to encode book", http.StatusInternalServerError)
+		return
+	}
 }
 
 func (h *BookHandlers) GetBookByID(w http.ResponseWriter, r *http.Request) {

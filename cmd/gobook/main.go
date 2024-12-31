@@ -37,6 +37,9 @@ func main() {
 	router.HandleFunc("DELETE /books/{id}", boooHandlers.DeleteBook)
 	router.HandleFunc("POST /books/simulate", boooHandlers.ReadBooks)
 
-	http.ListenAndServe(":8080", router)
+	err = http.ListenAndServe(":8080", router)
+	if err != nil {
+		panic(err)
+	}
 
 }
